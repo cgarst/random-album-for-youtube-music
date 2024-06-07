@@ -1,11 +1,12 @@
-var timeout = 300
+// Time to wait between clicks
+var timeout_short = 500
+var timeout_long = 1000
 
 // Function to check if the current URL matches the target URL
 function checkURLAndInitiate() {
   if (window.location.href === 'https://music.youtube.com/library/albums') {
     scrollAllAlbums();
   } else {
-    console.log('Navigating to the albums page...');
     // Click the first selector if the URL is not the target URL
     clickLibrary();
   }
@@ -13,11 +14,11 @@ function checkURLAndInitiate() {
 
 // Function to click the library button
 function clickLibrary() {
-  const librarySelector = document.querySelector('#items > ytmusic-guide-entry-renderer:nth-child(3) > tp-yt-paper-item > div > div.title-group.style-scope.ytmusic-guide-entry-renderer > yt-formatted-string');
+  const librarySelector = document.querySelector('#items > ytmusic-guide-entry-renderer:nth-child(3) > tp-yt-paper-item');
   if (librarySelector) {
+    console.log('Navigating to the library page...');
     librarySelector.click();
-    // Wait for the page to load before clicking the next selector
-    setTimeout(clickAlbums, timeout); // Adjust timing as needed
+    setTimeout(clickAlbums, timeout_long);
   } else {
     console.log('Library selector not found');
   }
@@ -29,11 +30,11 @@ function clickAlbums() {
   if (window.location.href === 'https://music.youtube.com/library/albums') {
     scrollAllAlbums();
   } else {
-    const albumsSelector = document.querySelector('#chips > ytmusic-chip-cloud-chip-renderer:nth-child(4) > div > a > yt-formatted-string');
+    const albumsSelector = document.querySelector('#chips > ytmusic-chip-cloud-chip-renderer:nth-child(4) > div > a');
     if (albumsSelector) {
+    console.log('Navigating to the albums page...');
       albumsSelector.click();
-      // Wait for the page to fully load before proceeding with the original behavior
-      setTimeout(scrollAllAlbums, timeout); // Adjust timing as needed
+      setTimeout(scrollAllAlbums, timeout_short);
     } else {
       console.log('Album selector not found');
     }
@@ -55,7 +56,7 @@ function scrollAllAlbums() {
     } else {
       previousItemCount = currentItemCount;
     }
-  }, timeout); // Adjust the interval time if needed
+  }, timeout_short); // Adjust the interval time if needed
 }
 
 // Function to count the number of available albums and click a random one
@@ -70,8 +71,7 @@ function countAlbumsAndClickRandom(items) {
     if (link) {
       // Click the link
       link.click();
-      // Wait for the page to load before clicking the play button
-      setTimeout(clickPlayButton, timeout); // Adjust timing as needed
+      setTimeout(clickPlayButton, timeout_short);
     } else {
       console.log('No link found in the random album');
     }
