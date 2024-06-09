@@ -1,5 +1,5 @@
-# 🎲 YouTube Music Random Album
-Can't decide which record to spin today? This browser extension plays a random album from your YouTube Music library.
+# 🎲 Random Album for YouTube Music™
+Can't decide which record to spin today? This browser extension plays a random album from your YouTube Music™ library.
 
 ## Chromium-based Browser Installation
  1. Browse to chrome://extensions
@@ -21,6 +21,9 @@ Temporary installation in the Firefox release version:
 
 ## Usage
 While in YouTube Music, click the extension icon. This will navigate to your album library, open a random album, and play it.
+
+## Troubleshooting
+The album will not automatically play if the site is denied autoplay by the browser. A message may be logged to console like "Autoplay is only allowed when approved by the user, the site is activated by the user, or media is muted." This can be resolved by giving the site autoplay permission in the permissions icon near the address bar.
 
 ## Credits
 Icon by [Icons8](https://icons8.com/)
