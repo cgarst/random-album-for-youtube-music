@@ -1,6 +1,6 @@
 // Time to wait between clicks
-var timeout_short = 500
-var timeout_long = 1000
+var timeout_short = 1000
+var timeout_long = 2000
 
 // Function to check if the current URL matches the target URL
 function checkURLAndInitiate() {
