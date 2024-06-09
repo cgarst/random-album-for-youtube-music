@@ -16,7 +16,7 @@
 "host_permissions": [ "https://music.youtube.com/*" ],
 "browser_specific_settings": {
   "gecko": {
-    "id": "test@mozilla.com"
+    "id": "{33c481aa-0754-44de-b3a5-8f92416d22d4}"
     }
  }
 }
