@@ -2,7 +2,7 @@
 Can't decide which record to spin today? This browser extension plays a random album from your YouTube Music™ library.
 
 ## Chromium-based Browser Installation
- 1. Browse to chrome://extensions
+ 1. Browse to `chrome://extensions`
  2. Enable extension developer mode in the browser, if necessary, to allow loading unpacked extensions
  3. Select the "Load unpacked" extension option and navigate to the `src/chromium/` directory
 
