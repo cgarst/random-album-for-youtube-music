@@ -1,5 +1,7 @@
 # 🎲 Random Album for YouTube Music™
-Can't decide which record to spin today? This browser extension plays a random album from your YouTube Music™ library.
+Can't decide which record to spin? This browser extension plays a random album from your YouTube Music™ library.
+
+Also available as a shortcut for [iOS](https://gist.github.com/cgarst/d61687c6d24fd1f6158dff0c6385f6e7)!
 
 ## Chromium-based Browser Installation
  1. Browse to `chrome://extensions`
