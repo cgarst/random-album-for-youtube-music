@@ -2,24 +2,28 @@
 Can't decide which record to spin? This browser extension plays a random album from your YouTube Music™ library.
 
 ## Chromium-based Browser Installation
+[Install from Chrome Web Store](https://chromewebstore.google.com/detail/random-album-for-youtube/obkkkldnmaoahhpkhomdmdpjldcpihph).
+
+For development:
+
  1. Browse to `chrome://extensions`
  2. Enable extension developer mode in the browser, if necessary, to allow loading unpacked extensions
  3. Select the "Load unpacked" extension option and navigate to the `src/chromium/` directory
 
 ## Firefox-based Browser Installation
-[Install from addons.mozilla.org](https://addons.mozilla.org/en-US/firefox/addon/random-album-for-youtube-music/).
+[Install from Add-ons for Firefox](https://addons.mozilla.org/en-US/firefox/addon/random-album-for-youtube-music/).
 
 For development:
 
  1. Temporary installation in the Firefox release version:
-  1. Run `cd bin/ && ./make_firefox_xpi.sh` to build the XPI extension file
-  2. Browse to `about:debugging` and "This Firefox"
-  3. Select "Load Temporary Add-On", "Install Add-on From File", and select `bin/random-album-for-youtube-music.xpi`
+   1. Run `cd bin/ && ./make_firefox_xpi.sh` to build the XPI extension file
+   2. Browse to `about:debugging` and "This Firefox"
+   3. Select "Load Temporary Add-On", "Install Add-on From File", and select `bin/random-album-for-youtube-music.xpi`
 
  2. Permanent installation in Firefox Developer Edition:
-  1. Browse to `about:config` and set `xpinstall.signatures.required` to "false"
-  2. Browse to `about:addons`, click the gear icon, and select "Install Add-on from File"
-  3. Select `bin/random-album-for-youtube-music.xpi`
+   1. Browse to `about:config` and set `xpinstall.signatures.required` to "false"
+   2. Browse to `about:addons`, click the gear icon, and select "Install Add-on from File"
+   3. Select `bin/random-album-for-youtube-music.xpi`
 
 ## Mobile Devices
 Random Album can be implemently nicely on [iOS](https://gist.github.com/cgarst/d61687c6d24fd1f6158dff0c6385f6e7) through a Shortcuts process of pre-caching albums and launching one in the native YouTube Music app from a home screen icon.
