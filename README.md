@@ -28,7 +28,7 @@ Development:
    3. Select `bin/random-album-for-youtube-music.xpi`
 
 ## Mobile Devices
-Random Album is be implemently  on [iOS](https://www.icloud.com/shortcuts/92a8c0e01abd40a4bc50593dc854fba0) through the Shortcuts app. This version is a two-part process. By first visiting YouTube Music in Safari and selecting Random Album in the share sheet, albums are pre-caching albums in a local file. Then, by tapping the shortcut in the home screen a random album is launched in the native YouTube Music app. The cache needs to be periodically re-generated from the share sheet to reflect albums later added or removed from your library.
+Random Album is implemented on [iOS](https://www.icloud.com/shortcuts/b69cc0ce28a846ca8e2845c775df3166) through the Shortcuts app. This version is a two-part process. By first visiting YouTube Music in Safari and selecting Random Album in the share sheet, albums are pre-caching albums in a local file. Then, by tapping the shortcut in the home screen a random album is launched in the native YouTube Music app. The cache needs to be periodically re-generated from the share sheet to reflect albums later added or removed from your library.
 
 Android devices can install the [add-on](https://addons.mozilla.org/en-US/firefox/addon/random-album-for-youtube-music/) within Firefox for Android. Selecting the extension from the Firefox menu. Optionally select "Open in app" from the Firefox menu to open the album in the native YouTube Music app.
 
