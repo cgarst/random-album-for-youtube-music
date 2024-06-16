@@ -1,0 +1,355 @@
+{
+   "WFWorkflowMinimumClientVersionString": "1106",
+   "WFWorkflowMinimumClientVersion": 1106,
+   "WFWorkflowIcon": {
+      "WFWorkflowIconStartColor": 4282601983,
+      "WFWorkflowIconGlyphNumber": 61479
+   },
+   "WFWorkflowClientVersion": "2510.5.1",
+   "WFWorkflowOutputContentItemClasses": [],
+   "WFWorkflowHasOutputFallback": false,
+   "WFWorkflowActions": [
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.comment",
+         "WFWorkflowActionParameters": {
+            "WFCommentActionText": "💿 Random Album for YouTube Music 🎶\n\nThis shortcut opens a random album from YouTube music. \n\nThis is a two-part process. By first visiting YouTube Music in Safari and selecting Random Album in the share sheet, albums are pre-caching albums in a local file. Then, by tapping the shortcut in the home screen a random album is launched in the native YouTube Music app. The cache needs to be periodically re-generated from the share sheet to reflect albums later added or removed from your library."
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.conditional",
+         "WFWorkflowActionParameters": {
+            "WFInput": {
+               "Type": "Variable",
+               "Variable": {
+                  "Value": {
+                     "Type": "ExtensionInput"
+                  },
+                  "WFSerializationType": "WFTextTokenAttachment"
+               }
+            },
+            "WFControlFlowMode": 0,
+            "GroupingIdentifier": "5109A287-C1FB-498C-8BDA-36D8F29CEAAD",
+            "WFCondition": 100
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.detect.link",
+         "WFWorkflowActionParameters": {
+            "WFInput": {
+               "Value": {
+                  "string": "\uFFFC",
+                  "attachmentsByRange": {
+                     "{0, 1}": {
+                        "Type": "ExtensionInput"
+                     }
+                  }
+               },
+               "WFSerializationType": "WFTextTokenString"
+            },
+            "UUID": "29B4DF14-3322-4D32-AA6B-3955DA550C9D"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.conditional",
+         "WFWorkflowActionParameters": {
+            "WFInput": {
+               "Type": "Variable",
+               "Variable": {
+                  "Value": {
+                     "OutputUUID": "29B4DF14-3322-4D32-AA6B-3955DA550C9D",
+                     "Type": "ActionOutput",
+                     "OutputName": "URLs"
+                  },
+                  "WFSerializationType": "WFTextTokenAttachment"
+               }
+            },
+            "WFControlFlowMode": 0,
+            "WFConditionalActionString": "https://music.youtube.com/",
+            "GroupingIdentifier": "6F75F3E0-46D4-4198-AECE-F7D6799DD223",
+            "WFCondition": 8
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.runjavascriptonwebpage",
+         "WFWorkflowActionParameters": {
+            "WFInput": {
+               "Value": {
+                  "Type": "ExtensionInput"
+               },
+               "WFSerializationType": "WFTextTokenAttachment"
+            },
+            "WFJavaScript": "// Time to wait between clicks\nvar timeout_short = 1000\nvar timeout_long = 2000\n\n// Function to check if the current URL matches the target URL\nfunction checkURLAndInitiate() {\n  if (window.location.href === 'https://music.youtube.com/library/albums') {\n    scrollAllAlbums();\n  } else {\n    // Click the first selector if the URL is not the target URL\n    clickLibrary();\n  }\n}\n\n// Function to click the library button\nfunction clickLibrary() {\n  const librarySelector = document.querySelector('#items > ytmusic-guide-entry-renderer:nth-child(3) > tp-yt-paper-item');\n  if (librarySelector) {\n    console.log('Navigating to the library page...');\n    librarySelector.click();\n    setTimeout(clickAlbums, timeout_long);\n  } else {\n    console.log('Library selector not found');\n  }\n}\n\n// Function to click the album button\nfunction clickAlbums() {\n  // Check if the current URL is the target URL before proceeding\n  if (window.location.href === 'https://music.youtube.com/library/albums') {\n    scrollAllAlbums();\n  } else {\n    const albumsSelector = document.querySelector('#chips > ytmusic-chip-cloud-chip-renderer:nth-child(4) > div > a');\n    if (albumsSelector) {\n    console.log('Navigating to the albums page...');\n      albumsSelector.click();\n      setTimeout(scrollAllAlbums, timeout_short);\n    } else {\n      console.log('Album selector not found');\n    }\n  }\n}\n\n// Function to continuously scroll to the bottom of the page until no more albums are loaded\nfunction scrollAllAlbums() {\n  let previousItemCount = 0;\n\n  const scrollInterval = setInterval(() => {\n    window.scrollTo(0, document.body.scrollHeight);\n    const items = document.querySelectorAll('[id^=\"items\"] > ytmusic-two-row-item-renderer');\n    const currentItemCount = items.length;\n\n    if (currentItemCount === previousItemCount) {\n      clearInterval(scrollInterval);\n    } else {\n      previousItemCount = currentItemCount;\n    }\n  }, timeout_short);\n}\n\ncheckURLAndInitiate();\ncompletion();",
+            "UUID": "2A025485-4784-4769-9874-1F12A84C5942"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.alert",
+         "WFWorkflowActionParameters": {
+            "WFAlertActionMessage": "⏳ Press \"OK\" when albums are done scrolling."
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.runjavascriptonwebpage",
+         "WFWorkflowActionParameters": {
+            "WFInput": {
+               "Value": {
+                  "Type": "ExtensionInput"
+               },
+               "WFSerializationType": "WFTextTokenAttachment"
+            },
+            "WFJavaScript": "var result = []\n\nconst items = document.querySelectorAll('[id^=\"items\"] > ytmusic-two-row-item-renderer');\n\nconsole.log('Total albums:', items.length);\nif (items.length > 0) {\nfor (let i = 1; i < items.length; i++) {\n    const albumATag = document.querySelectorAll('[id^=\"items\"] > ytmusic-two-row-item-renderer.style-scope:nth-child(' + i + ') > a:nth-child(1)')[0];\n    const albumHref = albumATag.getAttribute('href');\n    const albumTitle = albumATag.getAttribute('title');\n    result.push(albumHref)\n}\n} else {\nconsole.log('No albums found');\n}\n\nconsole.log(result);\ncompletion(result);",
+            "UUID": "D0D2EA3C-2CC5-413C-B009-265CBD022F86"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.gettext",
+         "WFWorkflowActionParameters": {
+            "WFTextActionText": {
+               "Value": {
+                  "string": "\uFFFC",
+                  "attachmentsByRange": {
+                     "{0, 1}": {
+                        "OutputUUID": "D0D2EA3C-2CC5-413C-B009-265CBD022F86",
+                        "Type": "ActionOutput",
+                        "OutputName": "JavaScript Result"
+                     }
+                  }
+               },
+               "WFSerializationType": "WFTextTokenString"
+            },
+            "UUID": "7185C52E-298B-427C-9413-31CCA053E5D0"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.documentpicker.save",
+         "WFWorkflowActionParameters": {
+            "WFAskWhereToSave": false,
+            "WFInput": {
+               "Value": {
+                  "OutputUUID": "7185C52E-298B-427C-9413-31CCA053E5D0",
+                  "Type": "ActionOutput",
+                  "OutputName": "Text"
+               },
+               "WFSerializationType": "WFTextTokenAttachment"
+            },
+            "UUID": "585DDFF4-DDF8-45CA-9560-87C18B171F1C",
+            "WFSaveFileOverwrite": true,
+            "WFFileDestinationPath": "albumcache"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.count",
+         "WFWorkflowActionParameters": {
+            "Input": {
+               "Value": {
+                  "OutputUUID": "585DDFF4-DDF8-45CA-9560-87C18B171F1C",
+                  "Type": "ActionOutput",
+                  "OutputName": "Saved File"
+               },
+               "WFSerializationType": "WFTextTokenAttachment"
+            },
+            "WFCountType": "Lines",
+            "UUID": "65C71AD4-C3E3-406A-931D-96EAA9D4E1A9"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.alert",
+         "WFWorkflowActionParameters": {
+            "WFAlertActionMessage": {
+               "Value": {
+                  "string": "Wrote \uFFFC albums to cache. Open one now?",
+                  "attachmentsByRange": {
+                     "{6, 1}": {
+                        "OutputUUID": "65C71AD4-C3E3-406A-931D-96EAA9D4E1A9",
+                        "Type": "ActionOutput",
+                        "OutputName": "Count"
+                     }
+                  }
+               },
+               "WFSerializationType": "WFTextTokenString"
+            }
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.runworkflow",
+         "WFWorkflowActionParameters": {
+            "WFWorkflow": {
+               "workflowIdentifier": "CA8D08BD-C5C5-40BF-A50E-7029B2F84059",
+               "workflowName": "Random Album",
+               "isSelf": true
+            },
+            "WFWorkflowName": "Random Album",
+            "UUID": "8E5EDDAA-DE6D-4D2F-9BCB-36C903BC182F"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.conditional",
+         "WFWorkflowActionParameters": {
+            "GroupingIdentifier": "6F75F3E0-46D4-4198-AECE-F7D6799DD223",
+            "WFControlFlowMode": 1
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.alert",
+         "WFWorkflowActionParameters": {
+            "WFAlertActionMessage": "⚠️ You must be on the YouTube Music website. "
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.conditional",
+         "WFWorkflowActionParameters": {
+            "WFControlFlowMode": 2,
+            "GroupingIdentifier": "6F75F3E0-46D4-4198-AECE-F7D6799DD223",
+            "UUID": "F0853EFB-3E89-4D74-A364-2620DE47DD0B"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.conditional",
+         "WFWorkflowActionParameters": {
+            "GroupingIdentifier": "5109A287-C1FB-498C-8BDA-36D8F29CEAAD",
+            "WFControlFlowMode": 1
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.documentpicker.open",
+         "WFWorkflowActionParameters": {
+            "WFGetFilePath": "albumcache.txt",
+            "WFFileErrorIfNotFound": false,
+            "UUID": "73F15E9D-AC42-4028-A397-4F945045B707"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.conditional",
+         "WFWorkflowActionParameters": {
+            "WFInput": {
+               "Type": "Variable",
+               "Variable": {
+                  "Value": {
+                     "OutputUUID": "73F15E9D-AC42-4028-A397-4F945045B707",
+                     "Type": "ActionOutput",
+                     "OutputName": "File"
+                  },
+                  "WFSerializationType": "WFTextTokenAttachment"
+               }
+            },
+            "WFControlFlowMode": 0,
+            "WFConditionalActionString": "albumcache.txt",
+            "GroupingIdentifier": "CCCDB22F-D92B-4423-A592-AFDAF167705D",
+            "WFCondition": 100
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.detect.text",
+         "WFWorkflowActionParameters": {
+            "WFInput": {
+               "Value": {
+                  "OutputUUID": "73F15E9D-AC42-4028-A397-4F945045B707",
+                  "Type": "ActionOutput",
+                  "OutputName": "File"
+               },
+               "WFSerializationType": "WFTextTokenAttachment"
+            },
+            "UUID": "3FFBD79D-C572-4C62-B166-4AC3A9876957"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.text.split",
+         "WFWorkflowActionParameters": {
+            "text": {
+               "Value": {
+                  "OutputUUID": "3FFBD79D-C572-4C62-B166-4AC3A9876957",
+                  "Type": "ActionOutput",
+                  "OutputName": "Text"
+               },
+               "WFSerializationType": "WFTextTokenAttachment"
+            },
+            "UUID": "676AB58F-B493-4D0A-AA2A-2568B481CE47"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.getitemfromlist",
+         "WFWorkflowActionParameters": {
+            "WFInput": {
+               "Value": {
+                  "OutputUUID": "676AB58F-B493-4D0A-AA2A-2568B481CE47",
+                  "Type": "ActionOutput",
+                  "OutputName": "Split Text"
+               },
+               "WFSerializationType": "WFTextTokenAttachment"
+            },
+            "WFItemSpecifier": "Random Item",
+            "UUID": "3976792A-8F9F-4CD7-85D0-4C359DDB9CB8"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.text.combine",
+         "WFWorkflowActionParameters": {
+            "text": {
+               "Value": {
+                  "string": "http://music.youtube.com/\uFFFC",
+                  "attachmentsByRange": {
+                     "{25, 1}": {
+                        "OutputUUID": "3976792A-8F9F-4CD7-85D0-4C359DDB9CB8",
+                        "Type": "ActionOutput",
+                        "OutputName": "Item from List"
+                     }
+                  }
+               },
+               "WFSerializationType": "WFTextTokenString"
+            },
+            "UUID": "4B1C305C-3AC0-4630-820F-8BE64A6B0985"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.openurl",
+         "WFWorkflowActionParameters": {
+            "WFInput": {
+               "Value": {
+                  "OutputUUID": "4B1C305C-3AC0-4630-820F-8BE64A6B0985",
+                  "Type": "ActionOutput",
+                  "OutputName": "Combined Text"
+               },
+               "WFSerializationType": "WFTextTokenAttachment"
+            },
+            "UUID": "6D65CED6-81E4-406F-9D7D-ADB10D786D78"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.conditional",
+         "WFWorkflowActionParameters": {
+            "GroupingIdentifier": "CCCDB22F-D92B-4423-A592-AFDAF167705D",
+            "WFControlFlowMode": 1
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.alert",
+         "WFWorkflowActionParameters": {
+            "WFAlertActionMessage": "⚠️ Album cache file not found. \n\nBefore launching this, open this shortcut via the share sheet in Safari while on the YouTube Music website to generate the cache file."
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.conditional",
+         "WFWorkflowActionParameters": {
+            "WFControlFlowMode": 2,
+            "GroupingIdentifier": "CCCDB22F-D92B-4423-A592-AFDAF167705D",
+            "UUID": "D56AB70C-981D-4B3D-B17F-7136039EBEEB"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.conditional",
+         "WFWorkflowActionParameters": {
+            "GroupingIdentifier": "5109A287-C1FB-498C-8BDA-36D8F29CEAAD",
+            "WFControlFlowMode": 2
+         }
+      }
+   ],
+   "WFWorkflowInputContentItemClasses": [
+      "WFSafariWebPageContentItem"
+   ],
+   "WFWorkflowImportQuestions": [],
+   "WFWorkflowTypes": [
+      "ActionExtension"
+   ],
+   "WFQuickActionSurfaces": [],
+   "WFWorkflowHasShortcutInputVariables": true
+}
