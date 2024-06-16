@@ -1,7 +1,14 @@
 # Random Album for YouTube Music™ iOS Shortcut
 
-Random Album is implemented for iOS through the Shortcuts app and [published through RoutineHub](https://routinehub.co/shortcut/18928/). This version is a two-part process. By first visiting YouTube Music in Safari and selecting Random Album in the share sheet, albums are pre-caching albums in a local file. Then, by tapping the shortcut in the home screen a random album is launched in the native YouTube Music app. The cache needs to be periodically re-generated from the share sheet to reflect albums later added or removed from your library.
+This shortcut plays a random album from your YouTube Music™ library on iOS and iPadOS with a two-part process:
+
+1. Visit YouTube Music in Safari and select Random Album in the share sheet. Albums are pre-cached in a local file. 
+2. Tap the shortcut in the home screen and a random album is launched in the native YouTube Music app.
+
+The cache needs to be periodically re-generated from the share sheet to reflect albums later added or removed from your library.
 
 ## Development
 
-Source for the shortcut is tracked here using [Shortcut Source Tool](https://routinehub.co/shortcut/5256/). This tool enables import/export of the shortcut as the `Random Album.json` file. The JavaScript portions are tracked as separate files to facilitate stand-alone testing.
+Source for the shortcut is tracked using the [Shortcut Source Tool](https://routinehub.co/shortcut/5256/). This tool enables import/export of the shortcut as the `Random Album.json` file. 
+
+The JavaScript portions are tracked as separate files to facilitate stand-alone testing.
