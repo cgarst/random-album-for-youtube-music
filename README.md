@@ -1,20 +1,19 @@
 # 🎲 Random Album for YouTube Music™
-Can't decide which record to spin? This browser extension plays a random album from your YouTube Music™ library.
+Can't decide which record to spin? This tool plays a random album from your YouTube Music™ library.
 
-## Usage
+[![name](res/Chrome.png)](https://chromewebstore.google.com/detail/random-album-for-youtube/obkkkldnmaoahhpkhomdmdpjldcpihph)
+[![name](res/Edge.png)](https://microsoftedge.microsoft.com/addons/detail/afmlimmhgjaemnkjjaomlogigfiodncd)
+[![name](res/Firefox.png)](tps://addons.mozilla.org/en-US/firefox/addon/random-album-for-youtube-music/)
+[![name](res/RoutineHub.png)](https://routinehub.co/shortcut/18928/)
+
+## Desktop Usage
+
 While in YouTube Music, click the extension icon. This will navigate to your album library, open a random album, and play it.
 
-## Chromium-based Browser Installation
-[Install from Chrome Web Store](https://chromewebstore.google.com/detail/random-album-for-youtube/obkkkldnmaoahhpkhomdmdpjldcpihph).
-[Install from Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/afmlimmhgjaemnkjjaomlogigfiodncd)
+## Mobile Usage
+Random Album is implemented for iOS through the Shortcuts app and [published through RoutineHub](https://routinehub.co/shortcut/18928/). This version is a two-part process. By first visiting YouTube Music in Safari and selecting Random Album in the share sheet, albums are pre-cached in a local file. Then, by tapping the shortcut in the home screen a random album is launched in the native YouTube Music app. The cache needs to be periodically re-generated from the share sheet to reflect albums later added or removed from your library.
 
-## Firefox-based Browser Installation
-[Install from Add-ons for Firefox](https://addons.mozilla.org/en-US/firefox/addon/random-album-for-youtube-music/).
-
-In addition to Firefox desktop, Android devices can install the same [add-on](https://addons.mozilla.org/en-US/firefox/addon/random-album-for-youtube-music/) within Firefox for Android. Selecting the extension from the Firefox menu. Optionally select "Open in app" from the Firefox menu to open the album in the native YouTube Music app.
-
-## iOS
-Random Album is implemented for iOS through the Shortcuts app and [published through RoutineHub](https://routinehub.co/shortcut/18928/). This version is a two-part process. By first visiting YouTube Music in Safari and selecting Random Album in the share sheet, albums are pre-caching albums in a local file. Then, by tapping the shortcut in the home screen a random album is launched in the native YouTube Music app. The cache needs to be periodically re-generated from the share sheet to reflect albums later added or removed from your library.
+Android devices can install the [add-on](https://addons.mozilla.org/en-US/firefox/addon/random-album-for-youtube-music/) within Firefox for Android. Selecting the extension from the Firefox menu. Optionally select "Open in app" from the Firefox menu to open the album in the native YouTube Music app.
 
 ## Troubleshooting
 The album will not automatically play if the site is denied autoplay by the browser. A message may be logged to console like "Autoplay is only allowed when approved by the user, the site is activated by the user, or media is muted." This can be resolved by giving the site autoplay permission in the permissions icon near the address bar.
