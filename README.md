@@ -1,5 +1,5 @@
 # 🎲 Random Album for YouTube Music™
-Can't decide which record to spin? This tool plays a random album from your YouTube Music™ library.
+Introducing Random Album for YouTube Music™, the extension that brings back the joy of experiencing music as it was meant to be heard – in its entirety. Just like dropping the needle on a vinyl record or popping a CD into your player, Random Album for YouTube Music™ scans your library to select and stream a random album from start to finish.
 
 [![name](res/Chrome.png)](https://chromewebstore.google.com/detail/random-album-for-youtube/obkkkldnmaoahhpkhomdmdpjldcpihph)
 [![name](res/Edge.png)](https://microsoftedge.microsoft.com/addons/detail/afmlimmhgjaemnkjjaomlogigfiodncd)
