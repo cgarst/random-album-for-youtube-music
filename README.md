@@ -3,7 +3,7 @@ Introducing Random Album for YouTube Music™, the extension that brings back th
 
 [![name](res/Chrome.png)](https://chromewebstore.google.com/detail/random-album-for-youtube/obkkkldnmaoahhpkhomdmdpjldcpihph)
 [![name](res/Edge.png)](https://microsoftedge.microsoft.com/addons/detail/afmlimmhgjaemnkjjaomlogigfiodncd)
-[![name](res/Firefox.png)](tps://addons.mozilla.org/en-US/firefox/addon/random-album-for-youtube-music/)
+[![name](res/Firefox.png)](https://addons.mozilla.org/en-US/firefox/addon/random-album-for-youtube-music/)
 [![name](res/RoutineHub.png)](https://routinehub.co/shortcut/18928/)
 
 ## Desktop Usage
