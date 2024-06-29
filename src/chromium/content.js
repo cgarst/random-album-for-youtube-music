@@ -1,17 +1,27 @@
 // Set a default value for albums_to_pick
-let albums_to_pick = 1;
+var albums_to_pick = 1;
 
 // Retrieve the album_shuffle_count from storage
-browser.storage.sync.get("album_shuffle_count").then((result) => {
-  if (result.album_shuffle_count !== undefined) {
-    albums_to_pick = result.album_shuffle_count;
+try {
+  browser.storage.sync.get("album_shuffle_count").then((result) => {
+    if (result.album_shuffle_count !== undefined) {
+      albums_to_pick = result.album_shuffle_count;
+    } else {
+      console.error("Unexpected albums shuffle count value in storage. Using default value:", albums_to_pick);
+    }
+  }).catch((error) => {
+    console.error("Error retrieving album shuffle count from storage:", error);
+    console.log("Using default value:", albums_to_pick);
+  });
+} catch (error) {
+  if (error instanceof ReferenceError && error.message.includes('browser is not defined')) {
+    console.warn("Warning: browser is not defined, likely running in console");
   } else {
-    console.log("Album shuffle count from settings not found. Using default value:", albums_to_pick);
+    console.error("Unexpected error:", error);
   }
-}).catch((error) => {
-  console.error("Error retrieving album shuffle count from storage:", error);
-  console.log("Using default value:", albums_to_pick);
-});
+}
+
+console.log("Random Album for YouTube Music started with an album shuffle count of ", albums_to_pick)
 
 // Time to wait between clicks
 var sleep_tiny = 10; // 10ms
@@ -196,10 +206,6 @@ async function main(items) {
     await sleep(10);
     clickNowPlayingButton();
     console.log("Queued " + queue_count + " out of " + albums_to_pick + " attempted albums")
-
-
-    } else {
-      console.log('Number of albums to select is not defined')
     }
   } else {
     console.log('No albums found');
