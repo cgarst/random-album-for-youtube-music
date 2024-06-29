@@ -1,5 +1,17 @@
-// Configuration
-var albums_to_pick = 1;
+// Set a default value for albums_to_pick
+let albums_to_pick = 1;
+
+// Retrieve the album_shuffle_count from storage
+browser.storage.sync.get("album_shuffle_count").then((result) => {
+  if (result.album_shuffle_count !== undefined) {
+    albums_to_pick = result.album_shuffle_count;
+  } else {
+    console.log("Album shuffle count from settings not found. Using default value:", albums_to_pick);
+  }
+}).catch((error) => {
+  console.error("Error retrieving album shuffle count from storage:", error);
+  console.log("Using default value:", albums_to_pick);
+});
 
 // Time to wait between clicks
 var sleep_tiny = 10; // 10ms
