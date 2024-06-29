@@ -21,7 +21,7 @@ try {
   }
 }
 
-console.log("Random Album for YouTube Music started with an album shuffle count of ", albums_to_pick)
+console.log("Random Album for YouTube Music started with an album shuffle count of", albums_to_pick)
 
 // Time to wait between clicks
 var sleep_tiny = 10; // 10ms
@@ -34,15 +34,16 @@ var library_button_sel = 'ytmusic-guide-section-renderer.style-scope:nth-child(1
 var albums_button_sel = 'ytmusic-chip-cloud-chip-renderer.style-scope:nth-child(4)';
 var albums_button_sel_left = 'ytmusic-chip-cloud-chip-renderer.style-scope:nth-child(3)';
 var album_list_sel = '[id^="items"] > ytmusic-two-row-item-renderer';
-var play_button_sel = 'ytmusic-play-button-renderer.ytmusic-responsive-header-renderer > div:nth-child(1)';
 var now_playing_button_sel = 'ytmusic-player-bar.style-scope';
 var queue_button_sel = 'ytmusic-menu-service-item-renderer.style-scope:nth-child(4)';
 var grid_album_sel = 'a:nth-child(1)';
 var grid_play_button_sel = 'a:nth-child(1) > ytmusic-item-thumbnail-overlay-renderer:nth-child(4) > div:nth-child(2) > ytmusic-play-button-renderer:nth-child(1)';
 var blank_space = '.center-content';
+var chip_links_sel = 'ytmusic-chip-cloud-chip-renderer > div > a';
 
 // Global counters
 var queue_count = 0;
+var first_album_done = false;
 
 // Function to check if the current URL matches the target URL
 function init() {
@@ -86,7 +87,7 @@ async function navToAlbumsPage() {
     // Check if the element exists
     if (chips) {
         // Get all children matching the hierarchy 'ytmusic-chip-cloud-chip-renderer > div > a'
-        const chipLinks1 = chips.querySelectorAll('ytmusic-chip-cloud-chip-renderer > div > a');
+        const chipLinks1 = chips.querySelectorAll(chip_links_sel);
 
         // Iterate over each 'a' element to find 'Clear filters'
         for (let link of chipLinks1) {
@@ -104,12 +105,10 @@ async function navToAlbumsPage() {
             clearFiltersSelector.click();
             console.log('Clicked the "Clear filters" selector.');
             await sleep(sleep_short);
-        } else {
-            console.log('No "Clear filters" selector found.');
         }
 
         const chips2 = document.querySelector('#chips');
-        const chipLinks2 = chips2.querySelectorAll('ytmusic-chip-cloud-chip-renderer > div > a');
+        const chipLinks2 = chips2.querySelectorAll(chip_links_sel);
         // Iterate again over each 'a' element again to find 'Show albums'
         for (let link of chipLinks2) {
             var title = link.getAttribute('title');
@@ -125,8 +124,7 @@ async function navToAlbumsPage() {
         if (albumsSelector) {
             console.log('Found the "Show albums" selector:', albumsSelector);
         } else {
-            console.log('No "Show albums" selector found.', chipLinks2);
-            throw new Error()
+            console.error('No "Show albums" selector found.', chipLinks2);
         }
     } else {
         console.log('No elements found with the CSS selector "chips".');
@@ -169,18 +167,17 @@ async function main(items) {
 
     // Single select mode
     num = selectRandomNumber(items);
-    console.log('Playing album ' + num);
-    await sleep(sleep_tiny);
+    var link = items[num].querySelector('a');
+    console.log('Playing album', num, getAlbumName(link));
+    await sleep(sleep_short);
     clickPlayButtonFromGrid(items[num]);
-    if (albums_to_pick === 1){
-      var link = items[num].querySelector('a');
-      link.click();
-      await sleep(sleep_short);
-    }
 
 
     // Multi select mode
     if (albums_to_pick > 1) {
+      while (first_album_done != true) {
+        await sleep(sleep_short);
+      }
       // Subtract the album already playing from the remaining count
       var remaining_albums = albums_to_pick - 1
       var links = []
@@ -190,22 +187,30 @@ async function main(items) {
         links.push(link);
         random_list.push(num);
       }
-      console.log('Albums: ' + random_list)
+      console.log('Albums to be queued: ' + random_list)
       // Queue the list of albums
       for (let i = 0; i < random_list.length; i++) {
-        console.log('Queueing album ' + random_list[i])
+        await sleep(sleep_short);
         var link = items[random_list[i]].querySelector('a');
-        //console.log(link);
+        console.log('Queueing album', random_list[i], getAlbumName(link));
         rightClick(link);
         await sleep(sleep_short);
-        clickQueueButton(link);
+        clickQueueButton();
         document.querySelector(blank_space).click();
         await sleep(sleep_short);
       }
-    // Open now playing screen when done queueing multiple
-    await sleep(10);
-    clickNowPlayingButton();
-    console.log("Queued " + queue_count + " out of " + albums_to_pick + " attempted albums")
+    }
+
+    // Open the final screen
+      await sleep(sleep_tiny);
+    if (albums_to_pick === 1){
+      // Leave the user viewing the album itself in this mode
+      var link = items[num].querySelector('a');
+      link.click();
+    } else if (albums_to_pick > 1){
+      // Open now playing screen when done queueing multiple
+      //clickNowPlayingButton();
+      console.log("Queued " + queue_count + " out of " + albums_to_pick + " attempted albums")
     }
   } else {
     console.log('No albums found');
@@ -223,7 +228,7 @@ function clickNowPlayingButton() {
 }
 
 // Function to click the queue option
-function clickQueueButton(element) {
+function clickQueueButton() {
   const queue_button = document.querySelector(queue_button_sel);
   if (queue_button) {
     queue_button.click();
@@ -242,30 +247,26 @@ function selectRandomNumber(items) {
   return randomIndex
 }
 
-// Function to play album from grid view
+// Function to play first album from grid view
 async function clickPlayButtonFromGrid(grid_album_item) {
-  var grid_album = grid_album_item.querySelector(grid_album_sel);
-  //grid_album.scrollIntoView();
-  mouseOver(grid_album);
+  await sleep(sleep_short);
+  mouseOver(grid_album_item);
   await sleep(sleep_long);
-  //console.log(grid_album);
-  var grid_play_button = grid_album.querySelector(grid_play_button_sel);
+  var grid_play_button = grid_album_item.querySelector(grid_play_button_sel);
   if (!grid_play_button) {
-    console.log('No grid play button for item number ' + num);
+    console.log('No grid play button for item number ' + num, grid_album_item);
   } else {
     grid_play_button.click();
+    first_album_done = true;
     ++queue_count;
   }
 }
 
-// Function to click the play button inside an album
-function clickPlayButton() {
-  var play_button = document.querySelector(play_button_sel);
-  if (play_button) {
-    play_button.click();
-  } else {
-    console.log('Play button not found');
-  }
+
+// Function to get album name from grid view
+async function getAlbumName(grid_album_item) {
+  var title = grid_album_item.getAttribute('title');
+  return title;
 }
 
 // Function to simulate a right click
