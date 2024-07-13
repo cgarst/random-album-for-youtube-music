@@ -145,7 +145,11 @@ async function navToAlbumsPage() {
 }
 
 // Function to continuously scroll to the bottom of the page until double checking that no more albums are loading on scroll
-function scrollAllAlbums() {
+function scrollAllAlbums() {  
+  // Bake-in the dimmed overlay and display it
+  createLoadingOverlay();
+  showLoading();
+
   let previousItemCount = 0;
   let x2previousItemCount = 0;
 
@@ -347,17 +351,17 @@ function createLoadingOverlay() {
   document.head.appendChild(style);
 
   // Create the overlay div
-  const overlay = document.createElement('div');
+  var overlay = document.createElement('div');
   overlay.id = 'dimOverlay';
   overlay.className = 'dim-overlay';
 
   // Create the loading message div
-  const message = document.createElement('div');
+  var message = document.createElement('div');
   message.className = 'loading-message';
   if (albums_to_pick > 1) {
     message.innerText = 'Queueing ' + albums_to_pick + ' random albums, please wait...';
   } else {
-    message.innerText = 'Playing ' + albums_to_pick + ' random album, please wait...';
+    message.innerText = 'Selecting ' + albums_to_pick + ' random album, please wait...';
   }
 
   // Append the message to the overlay
@@ -375,10 +379,6 @@ function showLoading() {
 function hideLoading() {
   document.getElementById('dimOverlay').style.visibility = 'hidden';
 }
-
-// Bake-in the dimmed overlay and display it
-createLoadingOverlay();
-showLoading();
 
 // Check the URL and initiate the process
 init();
