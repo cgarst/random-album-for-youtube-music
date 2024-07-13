@@ -2,10 +2,14 @@
 var albums_to_pick = 1;
 
 // Compatibility layer for browser.* and chrome.*
-if (typeof browser === "undefined") {
-  var browser = (function () {
-    return chrome;
-  })();
+try {
+  if (typeof browser === "undefined" && typeof chrome != "undefined") {
+    var browser = (function () {
+      return chrome;
+    })();
+  }
+} catch (error) {
+  console.warn("Warning: browser is not defined, likely running in console");
 }
 
 // Retrieve the album_shuffle_count from storage
@@ -21,13 +25,7 @@ try {
     console.warn("Using default album count:", albums_to_pick);
   });
 } catch (error) {
-  if (error instanceof ReferenceError && error.message.includes('browser is not defined')) {
-    console.warn("Warning: browser is not defined, likely running in console");
-  } else if (error instanceof TypeError && error.message.includes('Cannot read properties of undefined')) {
-    console.warn("Warning: storage sync property is not defined, likely running in console");
-  } else {
-    console.error("Unexpected error:", error);
-  }
+  console.warn("Couldn't getting random album saved settings:", error);
 }
 
 // Time to wait between clicks
@@ -262,6 +260,7 @@ function selectRandomNumber(items) {
 
 // Function to play first album from grid view
 async function clickPlayButtonFromGrid(grid_album_item) {
+  grid_album_item.scrollIntoView();
   await sleep(sleep_short);
   mouseOver(grid_album_item);
   await sleep(sleep_long);
