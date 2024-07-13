@@ -15,7 +15,8 @@
 },
 "host_permissions": [ "https://music.youtube.com/*" ],
 "options_ui": {
-  "page": "options.html"
+  "page": "options.html",
+  "browser_style": false
 },
 "browser_specific_settings": {
   "gecko": {

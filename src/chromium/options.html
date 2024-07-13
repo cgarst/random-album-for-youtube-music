@@ -2,13 +2,41 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <style>
+      body {
+        background-color: #333333;
+        color: #ffffff;
+        font-family: Arial, sans-serif;
+      }
+      input, button {
+        color: #333333;
+      }
+      a {
+        color: #1e90ff; /* A lighter blue color for readability */
+      }
+      a:visited {
+        color: #6495ed; /* A different shade of blue for visited links */
+      }
+      a:hover, a:focus {
+        color: #87cefa; /* A lighter shade for hover and focus states */
+      }
+    </style>
   </head>
 
   <body>
+    <br/>
     <form>
       <label>Number of albums to randomize <input type="number" id="album_shuffle_count" name="album_shuffle_count" /></label>
       <button type="submit">Save</button>
     </form>
+    <br/>This setting controls how many random albums are played when the extension icon is clicked. The default of "1" plays a single random album. When a higher number is set, album shuffling will occur where additional random albums are added to the play queue.
+    <br/>
+    <br/>
+    <br/><i><a href="https://github.com/cgarst/random-album-for-youtube-music">Visit Random Album for YouTube Music on GitHub</a></i>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
 
     <script src="options.js"></script>
   </body>

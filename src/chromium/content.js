@@ -7,7 +7,7 @@ try {
     if (result.album_shuffle_count !== undefined) {
       albums_to_pick = result.album_shuffle_count;
     } else {
-      console.error("Unexpected albums shuffle count value in storage. Using default value:", albums_to_pick);
+      console.warning("No albums shuffle count value in storage. Proceeding with default value:", albums_to_pick);
     }
   }).catch((error) => {
     console.error("Error retrieving album shuffle count from storage:", error);
@@ -20,8 +20,6 @@ try {
     console.error("Unexpected error:", error);
   }
 }
-
-console.log("Random Album for YouTube Music started with an album shuffle count of", albums_to_pick)
 
 // Time to wait between clicks
 var sleep_tiny = 10; // 10ms
@@ -163,7 +161,7 @@ function scrollAllAlbums() {
 async function main(items) {
   console.log('Total albums:', items.length);
   if (items.length > 0) {
-
+    console.log("Processing an album shuffle count of", albums_to_pick)
 
     // Single select mode
     num = selectRandomNumber(items);
@@ -187,7 +185,7 @@ async function main(items) {
         links.push(link);
         random_list.push(num);
       }
-      console.log('Albums to be queued: ' + random_list)
+      console.log('Album IDs to be queued: ' + random_list)
       // Queue the list of albums
       for (let i = 0; i < random_list.length; i++) {
         await sleep(sleep_short);
@@ -209,8 +207,8 @@ async function main(items) {
       link.click();
     } else if (albums_to_pick > 1){
       // Open now playing screen when done queueing multiple
-      //clickNowPlayingButton();
       console.log("Queued " + queue_count + " out of " + albums_to_pick + " attempted albums")
+      clickNowPlayingButton();
     }
   } else {
     console.log('No albums found');
