@@ -13,6 +13,9 @@
     "48": "icon48.png",
     "128": "icon128.png"
   },
-  "host_permissions": [ "https://music.youtube.com/*" ]
-
+  "host_permissions": [ "https://music.youtube.com/*" ],
+  "options_ui": {
+    "page": "options.html",
+    "browser_style": false
+  }
 }
