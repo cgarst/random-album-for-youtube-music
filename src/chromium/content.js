@@ -113,6 +113,7 @@ async function navToAlbumsPage() {
             await sleep(sleep_short);
         }
 
+        await sleep(sleep_short);
         const chips2 = document.querySelector('#chips');
         const chipLinks2 = chips2.querySelectorAll(chip_links_sel);
         // Iterate again over each 'a' element again to find 'Show albums'
@@ -223,6 +224,7 @@ async function main(items) {
       console.log("Queued " + queue_count + " out of " + albums_to_pick + " attempted albums")
       clickNowPlayingButton();
     }
+    hideLoading();
   } else {
     console.log('No albums found');
   }
@@ -314,6 +316,69 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// Function to create and append the overlay to the body
+function createLoadingOverlay() {
+  // Create the style element for CSS
+  const style = document.createElement('style');
+  style.type = 'text/css';
+  style.innerHTML = `
+    .dim-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      visibility: hidden;
+    }
+
+    .loading-message {
+      color: white;
+      font-size: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      border-radius: 5px;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Create the overlay div
+  const overlay = document.createElement('div');
+  overlay.id = 'dimOverlay';
+  overlay.className = 'dim-overlay';
+
+  // Create the loading message div
+  const message = document.createElement('div');
+  message.className = 'loading-message';
+  if (albums_to_pick > 1) {
+    message.innerText = 'Queueing ' + albums_to_pick + ' random albums, please wait...';
+  } else {
+    message.innerText = 'Playing ' + albums_to_pick + ' random album, please wait...';
+  }
+
+  // Append the message to the overlay
+  overlay.appendChild(message);
+
+  // Append the overlay to the body
+  document.body.appendChild(overlay);
+}
+
+// Functions to show and hide the overlay
+function showLoading() {
+  document.getElementById('dimOverlay').style.visibility = 'visible';
+}
+
+function hideLoading() {
+  document.getElementById('dimOverlay').style.visibility = 'hidden';
+}
+
+// Bake-in the dimmed overlay and display it
+createLoadingOverlay();
+showLoading();
 
 // Check the URL and initiate the process
 init();
