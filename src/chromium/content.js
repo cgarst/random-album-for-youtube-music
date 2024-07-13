@@ -1,7 +1,7 @@
 // Set a default value for albums_to_pick
-var albums_to_pick = 1;
+var albums_to_pick_default = 1;
 
-// Compatibility layer for browser.* and chrome.*
+// Compatibility layer for browser.* and chrome.* storage API calls
 try {
   if (typeof browser === "undefined" && typeof chrome != "undefined") {
     var browser = (function () {
@@ -18,14 +18,17 @@ try {
     if (result.album_shuffle_count !== undefined) {
       albums_to_pick = result.album_shuffle_count;
     } else {
+      var albums_to_pick = albums_to_pick_default;
       console.warn("No albums shuffle count value in storage. Proceeding with default value:", albums_to_pick);
     }
   }).catch((error) => {
     console.error("Error retrieving album shuffle count from storage:", error);
+    var albums_to_pick = albums_to_pick_default;
     console.warn("Using default album count:", albums_to_pick);
   });
 } catch (error) {
   console.warn("Couldn't getting random album saved settings:", error);
+  var albums_to_pick = albums_to_pick_default;
 }
 
 // Time to wait between clicks
@@ -65,6 +68,7 @@ function init() {
 function clickLibrary() {
   const librarySelector = document.querySelector(library_button_sel);
   if (librarySelector) {
+    updateUserMessage("Navigating to the library page...");
     console.log('Navigating to the library page...');
     librarySelector.click();
     setTimeout(navToAlbumsPage, sleep_long);
@@ -79,10 +83,8 @@ async function navToAlbumsPage() {
   if (window.location.href === albums_url) {
     scrollAllAlbums();
   } else {
-    //var albumsSelector = document.querySelector(albums_button_sel);
+    updateUserMessage("Navigating to the albums page...");
 
-
-    // START TEST
     // Select the parent element with the CSS selector 'chips'
     const chips = document.querySelector('#chips');
 
@@ -146,12 +148,11 @@ async function navToAlbumsPage() {
 
 // Function to continuously scroll to the bottom of the page until double checking that no more albums are loading on scroll
 function scrollAllAlbums() {  
-  // Bake-in the dimmed overlay and display it
-  createLoadingOverlay();
-  showLoading();
 
   let previousItemCount = 0;
   let x2previousItemCount = 0;
+
+  updateUserMessage("Scrolling through all albums...")
 
   const scrollInterval = setInterval(() => {
     window.scrollTo(0, document.body.scrollHeight);
@@ -179,9 +180,11 @@ async function main(items) {
     console.log("Processing an album shuffle count of", albums_to_pick)
 
     // Single select mode
+    updateUserMessage("Selecting a random album...");
     num = selectRandomNumber(items);
     var link = items[num].querySelector('a');
     console.log('Playing album', num, getAlbumName(link));
+    updateUserMessage('Playing album #' + num + ' of ' + items.length);
     await sleep(sleep_short);
     clickPlayButtonFromGrid(items[num]);
 
@@ -203,6 +206,8 @@ async function main(items) {
       console.log('Album IDs to be queued: ' + random_list)
       // Queue the list of albums
       for (let i = 0; i < random_list.length; i++) {
+        let user_count = i + 2
+        updateUserMessage("Queueing album #" + random_list[i] + " of " + items.length + " (" + user_count + "/" + albums_to_pick + ")");
         await sleep(sleep_short);
         var link = items[random_list[i]].querySelector('a');
         console.log('Queueing album', random_list[i], getAlbumName(link));
@@ -284,17 +289,18 @@ async function clickPlayButtonFromGrid(grid_album_item) {
 
 // Function to get album name from grid view
 async function getAlbumName(grid_album_item) {
-  var title = grid_album_item.getAttribute('title');
+  //var title = grid_album_item.getAttribute('title');
+  var titlePromise = grid_album_item.getAttribute('title');
+  var title = await titlePromise;
   return title;
 }
 
 // Function to simulate a right click
 function rightClick(element) {
-  if (!element) {
-    console.error('Element not found with the selector:', selector);
-    return;
-  }
+  // Scroll to the element first
+  element.scrollIntoView();
 
+  // Fire right click
   var event = new MouseEvent('contextmenu', {
     bubbles: true,
     cancelable: true,
@@ -357,12 +363,9 @@ function createLoadingOverlay() {
 
   // Create the loading message div
   var message = document.createElement('div');
+  message.id = 'loadingMessage';
   message.className = 'loading-message';
-  if (albums_to_pick > 1) {
-    message.innerText = 'Queueing ' + albums_to_pick + ' random albums, please wait...';
-  } else {
-    message.innerText = 'Selecting ' + albums_to_pick + ' random album, please wait...';
-  }
+  message.innerText = 'Preparing for random album selection...';
 
   // Append the message to the overlay
   overlay.appendChild(message);
@@ -379,6 +382,15 @@ function showLoading() {
 function hideLoading() {
   document.getElementById('dimOverlay').style.visibility = 'hidden';
 }
+
+// Function to update the message
+function updateUserMessage(newMessage) {
+  document.getElementById('loadingMessage').innerText = newMessage;
+}
+
+// Bake-in the dimmed overlay and display it
+createLoadingOverlay();
+showLoading();
 
 // Check the URL and initiate the process
 init();
