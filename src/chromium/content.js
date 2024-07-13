@@ -1,17 +1,24 @@
 // Set a default value for albums_to_pick
 var albums_to_pick = 1;
 
+// Compatibility layer for browser.* and chrome.*
+if (typeof browser === "undefined") {
+  var browser = (function () {
+    return chrome;
+  })();
+}
+
 // Retrieve the album_shuffle_count from storage
 try {
   browser.storage.sync.get("album_shuffle_count").then((result) => {
     if (result.album_shuffle_count !== undefined) {
       albums_to_pick = result.album_shuffle_count;
     } else {
-      console.warning("No albums shuffle count value in storage. Proceeding with default value:", albums_to_pick);
+      console.warn("No albums shuffle count value in storage. Proceeding with default value:", albums_to_pick);
     }
   }).catch((error) => {
     console.error("Error retrieving album shuffle count from storage:", error);
-    console.log("Using default value:", albums_to_pick);
+    console.warn("Using default album count:", albums_to_pick);
   });
 } catch (error) {
   if (error instanceof ReferenceError && error.message.includes('browser is not defined')) {
