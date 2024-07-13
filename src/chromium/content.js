@@ -23,6 +23,8 @@ try {
 } catch (error) {
   if (error instanceof ReferenceError && error.message.includes('browser is not defined')) {
     console.warn("Warning: browser is not defined, likely running in console");
+  } else if (error instanceof TypeError && error.message.includes('Cannot read properties of undefined')) {
+    console.warn("Warning: storage sync property is not defined, likely running in console");
   } else {
     console.error("Unexpected error:", error);
   }
@@ -48,6 +50,7 @@ var chip_links_sel = 'ytmusic-chip-cloud-chip-renderer > div > a';
 
 // Global counters
 var queue_count = 0;
+var played_count = 0;
 var first_album_done = false;
 
 // Function to check if the current URL matches the target URL
@@ -142,16 +145,17 @@ async function navToAlbumsPage() {
   }
 }
 
-// Function to continuously scroll to the bottom of the page until no more albums are loaded
+// Function to continuously scroll to the bottom of the page until double checking that no more albums are loading on scroll
 function scrollAllAlbums() {
   let previousItemCount = 0;
+  let x2previousItemCount = 0;
 
   const scrollInterval = setInterval(() => {
     window.scrollTo(0, document.body.scrollHeight);
     const items = document.querySelectorAll(album_list_sel);
     var currentItemCount = items.length;
 
-    if (currentItemCount === previousItemCount) {
+    if (currentItemCount === previousItemCount && x2previousItemCount === previousItemCount) {
       console.log('Finished scrolling with ' + currentItemCount + ' albums.')
       // Scroll back to top
       window.scrollTo(0, 0);
@@ -159,9 +163,10 @@ function scrollAllAlbums() {
       main(items);
     } else {
       console.log('Seeing ' + currentItemCount + ' albums, scrolling..')
+      x2previousItemCount = previousItemCount;
       previousItemCount = currentItemCount;
     }
-  }, sleep_short); // Adjust the interval time if needed
+  }, sleep_short);
 }
 
 // Main function to count the albums, get a random list, and make the selections
@@ -207,13 +212,16 @@ async function main(items) {
     }
 
     // Open the final screen
-      await sleep(sleep_tiny);
     if (albums_to_pick === 1){
-      // Leave the user viewing the album itself in this mode
+      // End at the album screen during single-select
+      while (played_count < 1) {
+        await sleep(sleep_long);
+        console.log("Waiting for grid play button click to fire.")
+      }
       var link = items[num].querySelector('a');
       link.click();
     } else if (albums_to_pick > 1){
-      // Open now playing screen when done queueing multiple
+      // End at the playing screen during multi-select
       console.log("Queued " + queue_count + " out of " + albums_to_pick + " attempted albums")
       clickNowPlayingButton();
     }
@@ -264,6 +272,7 @@ async function clickPlayButtonFromGrid(grid_album_item) {
     grid_play_button.click();
     first_album_done = true;
     ++queue_count;
+    ++played_count;
   }
 }
 
