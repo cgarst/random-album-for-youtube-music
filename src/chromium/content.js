@@ -69,7 +69,7 @@ function init() {
   } else if (window.location.href.startsWith(service_url)) {
     clickLibrary();
   } else {
-    updateUserMessage('Select the Random Album icon again once YouTube Music™, has loaded.');
+    updateUserMessage('Select the Random Album icon again once YouTube Music™ has loaded.');
     setTimeout(function() {
       window.location.href = albums_url;
     }, sleep_long);
