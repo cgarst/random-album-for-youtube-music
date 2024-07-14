@@ -8,7 +8,7 @@ Introducing Random Album for YouTube Music™, the extension that brings back th
 
 ## Desktop Usage
 
-While in YouTube Music, click the extension icon. This will navigate to your album library, open a random album, and play it.
+While in YouTube Music, click the extension icon. This will navigate to your album library, open a random album, and play it. For long listens, head to the extension options to enable album shuffle and queue up multiple albums!
 
 ## Mobile Usage
 Random Album is implemented for iOS through the Shortcuts app and [published through RoutineHub](https://routinehub.co/shortcut/18928/).
