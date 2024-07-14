@@ -1,42 +1,10 @@
-// Set a default value for albums_to_pick
-var albums_to_pick_default = 1;
-
-// Compatibility layer for browser.* and chrome.* storage API calls
-try {
-  if (typeof browser === "undefined" && typeof chrome != "undefined") {
-    var browser = (function () {
-      return chrome;
-    })();
-  }
-} catch (error) {
-  console.warn("Warning: browser is not defined, likely running in console");
-}
-
-// Retrieve the album_shuffle_count from storage
-try {
-  browser.storage.sync.get("album_shuffle_count").then((result) => {
-    if (result.album_shuffle_count !== undefined) {
-      albums_to_pick = result.album_shuffle_count;
-    } else {
-      var albums_to_pick = albums_to_pick_default;
-      console.warn("No albums shuffle count value in storage. Proceeding with default value:", albums_to_pick);
-    }
-  }).catch((error) => {
-    console.error("Error retrieving album shuffle count from storage:", error);
-    var albums_to_pick = albums_to_pick_default;
-    console.warn("Using default album count:", albums_to_pick);
-  });
-} catch (error) {
-  console.warn("Couldn't getting random album saved settings:", error);
-  var albums_to_pick = albums_to_pick_default;
-}
-
 // Time to wait between clicks
 var sleep_tiny = 10; // 10ms
 var sleep_short = 1000; // 1 second
 var sleep_long = 2000; // 2 seconds
 
 // Define targets
+var service_url = 'https://music.youtube.com/';
 var albums_url = 'https://music.youtube.com/library/albums';
 var library_button_sel = 'ytmusic-guide-section-renderer.style-scope:nth-child(1) > div:nth-child(3) > ytmusic-guide-entry-renderer:nth-child(3)';
 var albums_button_sel = 'ytmusic-chip-cloud-chip-renderer.style-scope:nth-child(4)';
@@ -54,13 +22,52 @@ var queue_count = 0;
 var played_count = 0;
 var first_album_done = false;
 
+// Determine album shuffle count
+function getShuffleCount() {
+  // Set a default value for albums_to_pick
+  const albums_to_pick_default = 1;
+
+  // Compatibility layer for browser.* and chrome.* storage API calls
+  if (typeof browser === "undefined" && typeof chrome !== "undefined") {
+    var browser = chrome;
+  }
+
+  // Retrieve the album_shuffle_count from storage
+  return new Promise((resolve, reject) => {
+    try {
+      browser.storage.sync.get("album_shuffle_count", (result) => {
+        if (browser.runtime.lastError) {
+          console.error("Error retrieving album shuffle count from storage:", browser.runtime.lastError);
+          resolve(albums_to_pick_default);
+        } else if (result.album_shuffle_count !== undefined) {
+          console.info("Using album shuffle count from storage:", result.album_shuffle_count);
+          resolve(result.album_shuffle_count);
+        } else {
+          console.warn("No album shuffle count value in storage. Proceeding with default value:", albums_to_pick_default);
+          resolve(albums_to_pick_default);
+        }
+      });
+    } catch (error) {
+      console.error("Error accessing storage API:", error);
+      resolve(albums_to_pick_default);
+    }
+  });
+}
+
 // Function to check if the current URL matches the target URL
 function init() {
   if (window.location.href === albums_url) {
     scrollAllAlbums();
   } else {
-    // Click the first selector if the URL is not the target URL
-    clickLibrary();
+    if (window.location.href.startsWith(service_url)) {
+      // Click the first selector if the URL is not the target URL
+      clickLibrary();
+    } else {
+      updateUserMessage('Select the Random Album icon again once YouTube Music™, has loaded.');
+      setTimeout(function() {
+        window.location.href = albums_url;
+      }, sleep_long);
+    }
   }
 }
 
@@ -152,7 +159,7 @@ function scrollAllAlbums() {
   let previousItemCount = 0;
   let x2previousItemCount = 0;
 
-  updateUserMessage("Scrolling through all albums...")
+  updateUserMessage("Loading all albums...")
 
   const scrollInterval = setInterval(() => {
     window.scrollTo(0, document.body.scrollHeight);
@@ -164,9 +171,12 @@ function scrollAllAlbums() {
       // Scroll back to top
       window.scrollTo(0, 0);
       clearInterval(scrollInterval);
-      main(items);
+      getShuffleCount().then((albums_to_pick) => {
+        console.log('Selecting ' + albums_to_pick + ' random albums.');
+        main(items, albums_to_pick);
+      });
     } else {
-      console.log('Seeing ' + currentItemCount + ' albums, scrolling..')
+      console.log('Counted ' + currentItemCount + ' albums so far, scrolling more..')
       x2previousItemCount = previousItemCount;
       previousItemCount = currentItemCount;
     }
@@ -174,17 +184,16 @@ function scrollAllAlbums() {
 }
 
 // Main function to count the albums, get a random list, and make the selections
-async function main(items) {
+async function main(items, albums_to_pick) {
   console.log('Total albums:', items.length);
   if (items.length > 0) {
-    console.log("Processing an album shuffle count of", albums_to_pick)
 
     // Single select mode
     updateUserMessage("Selecting a random album...");
     num = selectRandomNumber(items);
     var link = items[num].querySelector('a');
     console.log('Playing album', num, getAlbumName(link));
-    updateUserMessage('Playing album #' + num + ' of ' + items.length);
+    updateUserMessage('Randomly playing album #' + num + ' out of ' + items.length + ' (1/' + albums_to_pick + ')');
     await sleep(sleep_short);
     clickPlayButtonFromGrid(items[num]);
 
@@ -207,7 +216,7 @@ async function main(items) {
       // Queue the list of albums
       for (let i = 0; i < random_list.length; i++) {
         let user_count = i + 2
-        updateUserMessage("Queueing album #" + random_list[i] + " of " + items.length + " (" + user_count + "/" + albums_to_pick + ")");
+        updateUserMessage('Randomly adding album #' + random_list[i] + ' out of ' + items.length + ' to queue (' + user_count + '/' + albums_to_pick + ')');
         await sleep(sleep_short);
         var link = items[random_list[i]].querySelector('a');
         console.log('Queueing album', random_list[i], getAlbumName(link));
@@ -365,7 +374,7 @@ function createLoadingOverlay() {
   var message = document.createElement('div');
   message.id = 'loadingMessage';
   message.className = 'loading-message';
-  message.innerText = 'Preparing for random album selection...';
+  message.innerText = 'Loading Random Album for YouTube Music™';
 
   // Append the message to the overlay
   overlay.appendChild(message);
