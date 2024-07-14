@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Random Album for YouTube Music™",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Automatically play a random album from your YouTube Music™ library by clicking the extension icon.",
   "permissions": ["activeTab", "scripting", "storage"],
   "action": {},
