@@ -6,6 +6,7 @@ var sleep_long = 2000; // 2 seconds
 // Define targets
 var service_url = 'https://music.youtube.com/';
 var albums_url = 'https://music.youtube.com/library/albums';
+var watch_url = 'https://music.youtube.com/watch';
 var library_button_sel = 'ytmusic-guide-section-renderer.style-scope:nth-child(1) > div:nth-child(3) > ytmusic-guide-entry-renderer:nth-child(3)';
 var albums_button_sel = 'ytmusic-chip-cloud-chip-renderer.style-scope:nth-child(4)';
 var albums_button_sel_left = 'ytmusic-chip-cloud-chip-renderer.style-scope:nth-child(3)';
@@ -58,16 +59,20 @@ function getShuffleCount() {
 function init() {
   if (window.location.href === albums_url) {
     scrollAllAlbums();
-  } else {
-    if (window.location.href.startsWith(service_url)) {
-      // Click the first selector if the URL is not the target URL
-      clickLibrary();
+  } else if (window.location.href.startsWith(watch_url)) {
+    clickNowPlayingButton();
+    if (window.location.href === albums_url) {
+      scrollAllAlbums();
     } else {
-      updateUserMessage('Select the Random Album icon again once YouTube Music™, has loaded.');
-      setTimeout(function() {
-        window.location.href = albums_url;
-      }, sleep_long);
+      clickLibrary();
     }
+  } else if (window.location.href.startsWith(service_url)) {
+    clickLibrary();
+  } else {
+    updateUserMessage('Select the Random Album icon again once YouTube Music™, has loaded.');
+    setTimeout(function() {
+      window.location.href = albums_url;
+    }, sleep_long);
   }
 }
 
@@ -189,11 +194,10 @@ async function main(items, albums_to_pick) {
   if (items.length > 0) {
 
     // Single select mode
-    updateUserMessage("Selecting a random album...");
     num = selectRandomNumber(items);
     var link = items[num].querySelector('a');
     console.log('Playing album', num, getAlbumName(link));
-    updateUserMessage('Randomly playing album #' + num + ' out of ' + items.length + ' (1/' + albums_to_pick + ')');
+    updateUserMessage('Playing random album #' + num + ' out of ' + items.length + ' (1/' + albums_to_pick + ')');
     await sleep(sleep_short);
     clickPlayButtonFromGrid(items[num]);
 
@@ -216,7 +220,7 @@ async function main(items, albums_to_pick) {
       // Queue the list of albums
       for (let i = 0; i < random_list.length; i++) {
         let user_count = i + 2
-        updateUserMessage('Randomly adding album #' + random_list[i] + ' out of ' + items.length + ' to queue (' + user_count + '/' + albums_to_pick + ')');
+        updateUserMessage('Adding random album #' + random_list[i] + ' out of ' + items.length + ' to queue (' + user_count + '/' + albums_to_pick + ')');
         await sleep(sleep_short);
         var link = items[random_list[i]].querySelector('a');
         console.log('Queueing album', random_list[i], getAlbumName(link));
