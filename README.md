@@ -37,5 +37,17 @@ Sideloading on Firefox browsers:
    * Browse to `about:addons`, click the gear icon, and select "Install Add-on from File"
    * Select `bin/random-album-for-youtube-music.xpi`
 
+### Integration Tests
+
+To run the end-to-end integration tests using Playwright:
+
+```bash
+# Run headless (default, uses saved session in ~/.cache/playwright_ytmusic_profile)
+python3 tests/test_integration.py
+
+# Or run with browser UI visible
+HEADLESS=false python3 tests/test_integration.py
+```
+
 ## Credits
 Icon by [Icons8](https://icons8.com/)
