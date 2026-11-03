@@ -86,7 +86,7 @@ jobs:
       - name: Upload & Publish to Chrome Web Store
         uses: wdzeng/chrome-extension@v2
         with:
-          extension-id: ${{ secrets.CHROME_EXTENSION_ID }}
+          extension-id: ${{ secrets.CHROME_EXTENSION_ID || 'obkkkldnmaoahhpkhomdmdpjldcpihph' }}
           publisher-id: ${{ secrets.CHROME_PUBLISHER_ID }}
           zip-path: 'bin/random-album-for-youtube-music.zip'
           client-id: ${{ secrets.CHROME_CLIENT_ID }}
@@ -106,7 +106,7 @@ jobs:
           path: bin
 
       - name: Upload & Submit to Firefox Add-ons (AMO)
-        uses: wdzeng/firefox-addon@v2
+        uses: wdzeng/firefox-addon@v1
         with:
           addon-guid: '{33c481aa-0754-44de-b3a5-8f92416d22d4}'
           xpi-path: 'bin/random-album-for-youtube-music.xpi'

@@ -33,8 +33,8 @@ Add these secrets in GitHub under **Settings > Secrets and variables > Actions >
 | `FIREFOX_JWT_ISSUER` | Firefox | AMO API Key (JWT Issuer) |
 | `FIREFOX_JWT_SECRET` | Firefox | AMO API Secret (JWT Secret) |
 | `EDGE_PRODUCT_ID` | Edge | Partner Center Product ID (GUID) |
-| `EDGE_CLIENT_ID` | Edge | Microsoft Entra ID (Azure AD) App Client ID |
-| `EDGE_API_KEY` | Edge | Microsoft Partner Center / Entra ID Client Secret |
+| `EDGE_CLIENT_ID` | Edge | Microsoft Partner Center Publish API Client ID |
+| `EDGE_API_KEY` | Edge | Microsoft Partner Center Publish API Key |
 
 > [!NOTE]
 > `GITHUB_TOKEN` is automatically provided by GitHub Actions and does not need to be configured manually.
@@ -135,12 +135,13 @@ Enter your Client ID and Client Secret when prompted, open the displayed URL in 
 3. In the left navigation, click **Product overview** (or check the browser URL: `https://partner.microsoft.com/dashboard/microsoftedge/<PRODUCT_ID>/...`).
 4. Copy the Product ID (a GUID format such as `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`). Save as `EDGE_PRODUCT_ID`.
 
-### Step 2: Set Up API Access (Entra ID App)
-1. In the Partner Center, click the **Settings** gear icon in the top right > **Account settings**.
-2. In the left menu, select **API access** (or **Access management** / **Azure AD Applications**).
-3. Click **Create Azure AD Application** (or link an existing application).
-4. Once created, note the **Client ID** (Application ID). Save as `EDGE_CLIENT_ID`.
-5. Under **Keys**, click **Add key** to generate a client secret / API Key. Copy the generated key value immediately. Save as `EDGE_API_KEY`.
+### Step 2: Set Up API Access (Partner Center Publish API)
+1. In the Microsoft Partner Center, go to **Microsoft Edge** in the dashboard navigation.
+2. In the left navigation menu, click **Publish API**.
+3. Opt-in / Enable the latest version of the Publish API experience if prompted.
+4. Click **Create API credentials** (or **Generate API key**).
+5. Copy the generated **Client ID** and save it as `EDGE_CLIENT_ID`.
+6. Copy the generated **API Key** immediately and save it as `EDGE_API_KEY` (note: keys expire periodically, e.g. after 72 days, so keep track of the expiration).
 
 ---
 
