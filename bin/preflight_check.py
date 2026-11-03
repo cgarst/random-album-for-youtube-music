@@ -106,7 +106,7 @@ def verify_archives(version):
     print("📦 Verifying package archives...")
     # Build packages
     res_chrome = subprocess.run(
-        ["./make_chromium_zip.sh"],
+        ["bash", "./make_chromium_zip.sh"],
         cwd=BIN_DIR,
         capture_output=True,
         text=True,
@@ -116,7 +116,7 @@ def verify_archives(version):
         sys.exit(1)
 
     res_ff = subprocess.run(
-        ["./make_firefox_xpi.sh"],
+        ["bash", "./make_firefox_xpi.sh"],
         cwd=BIN_DIR,
         capture_output=True,
         text=True,
