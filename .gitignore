@@ -1,3 +1,5 @@
 bin/random-album-for-youtube-music.xpi
 bin/random-album-for-youtube-music.zip
 .DS_Store
+__pycache__/
+*.pyc

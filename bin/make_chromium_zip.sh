@@ -1,2 +1,17 @@
-# /bin/bash
-zip -r -j -FS random-album-for-youtube-music.zip ../src/chromium/{manifest.json,background.js,content.js,icon16.png,icon48.png,icon128.png,options.html,options.js} --exclude '*.git*'
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+zip -r -j -FS random-album-for-youtube-music.zip \
+  ../src/chromium/manifest.json \
+  ../src/chromium/background.js \
+  ../src/chromium/content.js \
+  ../src/chromium/icon16.png \
+  ../src/chromium/icon48.png \
+  ../src/chromium/icon128.png \
+  ../src/chromium/options.html \
+  ../src/chromium/options.js \
+  --exclude '*.git*'
+

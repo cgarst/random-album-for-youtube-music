@@ -1,0 +1,28 @@
+name: CI Checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Validate Manifests & Packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Unit Tests
+        run: python3 tests/test_preflight.py
+
+      - name: Run Extension Pre-flight Validation
+        run: python3 bin/preflight_check.py --allow-equal-version

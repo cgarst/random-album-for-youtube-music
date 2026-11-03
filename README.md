@@ -49,5 +49,46 @@ python3 tests/test_integration.py
 HEADLESS=false python3 tests/test_integration.py
 ```
 
+### Releasing & Publishing
+
+Publishing updates to the Chrome Web Store, Mozilla Add-ons (Firefox), and Microsoft Edge Add-ons is automated via the GitHub Actions [Publish Extension Updates](.github/workflows/publish.yml) workflow. For full setup instructions and where to acquire API credentials, see [CI.md](CI.md).
+
+#### 1. Version Sync & Pre-flight Check
+Before releasing:
+1. Bump `"version"` simultaneously in:
+   - `src/chromium/manifest.json`
+   - `src/firefox/manifest.json`
+2. Run the pre-flight check locally:
+   ```bash
+   ./bin/preflight_check.py
+   ```
+   The pre-flight check enforces that:
+   - Both manifests have identical version numbers.
+   - The version format conforms to browser extension standards.
+   - The version is strictly higher than any previously tagged release.
+   - All required assets exist and packages build successfully.
+
+#### 2. Triggering a Release
+* Create a git tag matching the version (e.g., `v1.2` or `1.2`) and publish a GitHub Release.
+* The workflow will run the pre-flight check, build packages, attach the `.zip` and `.xpi` archives to the GitHub Release, and submit the updates to Chrome, Firefox, and Edge in parallel.
+* You can also trigger the workflow manually under **Actions** > **Publish Extension Updates** with the option to publish to all or specific stores.
+
+#### 3. Required Repository Secrets
+Configure these under **Settings** > **Secrets and variables** > **Actions**:
+
+* **Chrome Web Store:**
+  * `CHROME_EXTENSION_ID`: `obkkkldnmaoahhpkhomdmdpjldcpihph`
+  * `CHROME_PUBLISHER_ID`
+  * `CHROME_CLIENT_ID`
+  * `CHROME_CLIENT_SECRET`
+  * `CHROME_REFRESH_TOKEN`
+* **Mozilla Firefox Add-ons:**
+  * `FIREFOX_JWT_ISSUER`
+  * `FIREFOX_JWT_SECRET`
+* **Microsoft Edge Add-ons:**
+  * `EDGE_PRODUCT_ID`
+  * `EDGE_CLIENT_ID`
+  * `EDGE_API_KEY`
+
 ## Credits
 Icon by [Icons8](https://icons8.com/)
