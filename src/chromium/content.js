@@ -14,7 +14,7 @@ var album_list_sel = '[id^="items"] > ytmusic-two-row-item-renderer';
 var now_playing_button_sel = 'ytmusic-player-bar.style-scope';
 var queue_button_sel = 'ytmusic-menu-service-item-renderer.style-scope:nth-child(4)';
 var grid_album_sel = 'a:nth-child(1)';
-var grid_play_button_sel = 'a:nth-child(1) > ytmusic-item-thumbnail-overlay-renderer:nth-child(4) > div:nth-child(2) > ytmusic-play-button-renderer:nth-child(1)';
+var grid_play_button_sel = '#play-button, ytmusic-play-button-renderer';
 var blank_space = '.center-content';
 var chip_links_sel = 'ytmusic-chip-cloud-chip-renderer > div > a';
 
@@ -152,7 +152,9 @@ async function navToAlbumsPage() {
     }
 
     console.log('Navigating to the albums page...');
-    albumsSelector.click();
+    if (albumsSelector) {
+      albumsSelector.click();
+    }
     await sleep(sleep_long);
     scrollAllAlbums();
   }
@@ -196,11 +198,11 @@ async function main(items, albums_to_pick) {
     // Single select mode
     num = selectRandomNumber(items);
     var link = items[num].querySelector('a');
-    console.log('Playing album', num, getAlbumName(link));
-    updateUserMessage('Playing random album #' + num + ' out of ' + items.length + ' (1/' + albums_to_pick + ')');
+    var albumName = getAlbumName(link);
+    console.log('Playing album', num, albumName);
+    updateUserMessage('Playing random album #' + (num + 1) + ' out of ' + items.length + (albumName ? ' (' + albumName + ')' : ''));
     await sleep(sleep_short);
-    clickPlayButtonFromGrid(items[num]);
-
+    await clickPlayButtonFromGrid(items[num]);
 
     // Multi select mode
     if (albums_to_pick > 1) {
@@ -208,47 +210,61 @@ async function main(items, albums_to_pick) {
         await sleep(sleep_short);
       }
       // Subtract the album already playing from the remaining count
-      var remaining_albums = albums_to_pick - 1
-      var links = []
-      var random_list = []
-      while (links.length < remaining_albums) {
-        num = selectRandomNumber(items);
-        links.push(link);
-        random_list.push(num);
+      var remaining_albums = albums_to_pick - 1;
+      var chosen_set = new Set([num]);
+      var random_list = [];
+      while (random_list.length < remaining_albums && chosen_set.size < items.length) {
+        var next_num = selectRandomNumber(items);
+        if (!chosen_set.has(next_num)) {
+          chosen_set.add(next_num);
+          random_list.push(next_num);
+        }
       }
-      console.log('Album IDs to be queued: ' + random_list)
+      console.log('Album IDs to be queued: ' + random_list);
       // Queue the list of albums
       for (let i = 0; i < random_list.length; i++) {
-        let user_count = i + 2
-        updateUserMessage('Adding random album #' + random_list[i] + ' out of ' + items.length + ' to queue (' + user_count + '/' + albums_to_pick + ')');
+        let user_count = i + 2;
+        var queue_link = items[random_list[i]].querySelector('a');
+        var queue_name = getAlbumName(queue_link);
+        updateUserMessage('Adding random album #' + (random_list[i] + 1) + ' out of ' + items.length + ' to queue (' + user_count + '/' + albums_to_pick + ')');
         await sleep(sleep_short);
-        var link = items[random_list[i]].querySelector('a');
-        console.log('Queueing album', random_list[i], getAlbumName(link));
-        rightClick(link);
+        console.log('Queueing album', random_list[i], queue_name);
+        rightClick(queue_link);
         await sleep(sleep_short);
         clickQueueButton();
-        document.querySelector(blank_space).click();
+        var blank = document.querySelector(blank_space);
+        if (blank) blank.click();
         await sleep(sleep_short);
       }
     }
 
     // Open the final screen
-    if (albums_to_pick === 1){
-      // End at the album screen during single-select
-      while (played_count < 1) {
+    if (albums_to_pick === 1) {
+      // Navigate to the album page
+      if (link) {
+        link.click();
         await sleep(sleep_long);
-        console.log("Waiting for grid play button click to fire.")
       }
-      var link = items[num].querySelector('a');
-      link.click();
-    } else if (albums_to_pick > 1){
+      // Fallback: If playback didn't start or was interrupted by navigation, click play on the album page header
+      var video = document.querySelector('video');
+      if (!video || video.paused) {
+        var headerPlayBtn = document.querySelector('ytmusic-responsive-header-renderer #play-button, ytmusic-responsive-header-renderer ytmusic-play-button-renderer');
+        if (headerPlayBtn) {
+          console.log('Triggering header play button fallback on album page');
+          var clickable = headerPlayBtn.querySelector('#button, button') || headerPlayBtn;
+          clickable.click();
+          await sleep(sleep_short);
+        }
+      }
+    } else if (albums_to_pick > 1) {
       // End at the playing screen during multi-select
-      console.log("Queued " + queue_count + " out of " + albums_to_pick + " attempted albums")
+      console.log("Queued " + queue_count + " out of " + albums_to_pick + " attempted albums");
       clickNowPlayingButton();
     }
     hideLoading();
   } else {
     console.log('No albums found');
+    hideLoading();
   }
 }
 
@@ -264,6 +280,14 @@ function clickNowPlayingButton() {
 
 // Function to click the queue option
 function clickQueueButton() {
+  const menuItems = document.querySelectorAll('ytmusic-menu-popup-renderer ytmusic-menu-service-item-renderer, ytmusic-menu-popup-renderer ytmusic-menu-navigation-item-renderer');
+  for (const item of menuItems) {
+    if (item.innerText && item.innerText.toLowerCase().includes('queue')) {
+      item.click();
+      ++queue_count;
+      return;
+    }
+  }
   const queue_button = document.querySelector(queue_button_sel);
   if (queue_button) {
     queue_button.click();
@@ -273,13 +297,27 @@ function clickQueueButton() {
   }
 }
 
-// Function to select random item
+// Function to select random item index
 function selectRandomNumber(items) {
-  // Generate a random index between 0 and the total number of items
-  var randomIndex = Math.floor(Math.random() * items.length);
-  // Shift from zero index
-  ++randomIndex
-  return randomIndex
+  // Generate a random 0-based index between 0 and items.length - 1
+  return Math.floor(Math.random() * items.length);
+}
+
+// Function to wait until audio/video playback starts
+async function waitForPlaybackStart(timeoutMs = 7000) {
+  const startTime = Date.now();
+  while (Date.now() - startTime < timeoutMs) {
+    const video = document.querySelector('video');
+    if (video && (!video.paused || video.currentTime > 0.3)) {
+      return true;
+    }
+    const barTitle = document.querySelector('ytmusic-player-bar .title')?.innerText;
+    if (barTitle && barTitle.trim().length > 0) {
+      return true;
+    }
+    await sleep(200);
+  }
+  return false;
 }
 
 // Function to play first album from grid view
@@ -287,29 +325,40 @@ async function clickPlayButtonFromGrid(grid_album_item) {
   grid_album_item.scrollIntoView();
   await sleep(sleep_short);
   mouseOver(grid_album_item);
-  await sleep(sleep_long);
-  var grid_play_button = grid_album_item.querySelector(grid_play_button_sel);
+  await sleep(sleep_short);
+
+  // Wait for play button overlay to be stamped into DOM if needed
+  let grid_play_button = null;
+  for (let i = 0; i < 20; i++) {
+    grid_play_button = grid_album_item.querySelector(grid_play_button_sel);
+    if (grid_play_button) break;
+    await sleep(100);
+  }
+
   if (!grid_play_button) {
     console.log('No grid play button for item number ' + num, grid_album_item);
+    return false;
   } else {
-    grid_play_button.click();
+    const clickable = grid_play_button.querySelector('#button, button') || grid_play_button;
+    clickable.click();
+    const started = await waitForPlaybackStart(7000);
+    console.log('Playback started from grid:', started);
     first_album_done = true;
     ++queue_count;
     ++played_count;
+    return started;
   }
 }
 
-
 // Function to get album name from grid view
-async function getAlbumName(grid_album_item) {
-  //var title = grid_album_item.getAttribute('title');
-  var titlePromise = grid_album_item.getAttribute('title');
-  var title = await titlePromise;
-  return title;
+function getAlbumName(grid_album_item) {
+  if (!grid_album_item) return '';
+  return grid_album_item.getAttribute('title') || grid_album_item.innerText?.trim() || '';
 }
 
 // Function to simulate a right click
 function rightClick(element) {
+  if (!element) return;
   // Scroll to the element first
   element.scrollIntoView();
 
@@ -326,6 +375,7 @@ function rightClick(element) {
 
 // Function to simulate a mouse over
 function mouseOver(element) {
+  if (!element) return;
   const event = new MouseEvent('mouseover', {
       bubbles: true,
       cancelable: true,
@@ -341,10 +391,14 @@ function sleep(ms) {
 
 // Function to create and append the overlay to the body
 function createLoadingOverlay() {
+  if (document.getElementById('dimOverlay')) {
+    return;
+  }
+
   // Create the style element for CSS
   const style = document.createElement('style');
   style.type = 'text/css';
-  style.innerHTML = `
+  style.textContent = `
     .dim-overlay {
       position: fixed;
       top: 0;
@@ -389,16 +443,19 @@ function createLoadingOverlay() {
 
 // Functions to show and hide the overlay
 function showLoading() {
-  document.getElementById('dimOverlay').style.visibility = 'visible';
+  const overlay = document.getElementById('dimOverlay');
+  if (overlay) overlay.style.visibility = 'visible';
 }
 
 function hideLoading() {
-  document.getElementById('dimOverlay').style.visibility = 'hidden';
+  const overlay = document.getElementById('dimOverlay');
+  if (overlay) overlay.style.visibility = 'hidden';
 }
 
 // Function to update the message
 function updateUserMessage(newMessage) {
-  document.getElementById('loadingMessage').innerText = newMessage;
+  const msg = document.getElementById('loadingMessage');
+  if (msg) msg.innerText = newMessage;
 }
 
 // Bake-in the dimmed overlay and display it
